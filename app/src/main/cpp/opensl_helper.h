@@ -1,0 +1,46 @@
+#ifndef OPENSL_HELPER_H_
+#define OPENSL_HELPER_H_
+
+#include <SLES/OpenSLES.h>
+#include <SLES/OpenSLES_Android.h>
+#include <android/log.h>
+#include <pthread.h>
+
+#define LOG(...) __android_log_print(ANDROID_LOG_DEBUG, "OpenSLDemo-JNI", __VA_ARGS__)
+
+typedef struct {
+	pthread_mutex_t m;
+	pthread_cond_t c;
+	unsigned char s;
+} ThreadLock;
+
+typedef struct {
+	SLObjectItf engineObject;
+	SLEngineItf engineInterface;
+
+	SLObjectItf recorderObject;
+	SLRecordItf recorderInterface;
+
+	SLObjectItf outputMixObject;
+
+	SLObjectItf playerObject;
+	SLPlayItf playInterface;
+
+	SLAndroidSimpleBufferQueueItf queueInterface;
+
+	ThreadLock threadLock;
+} OpenSLHelper;
+
+void lockInit(ThreadLock* pThreadLock);
+void lockWait(ThreadLock* pThreadLock);
+void lockNotify(ThreadLock* pThreadLock);
+void lockDestroy(ThreadLock* pThreadLock);
+
+void openSLHelperInit(OpenSLHelper* pHelper);
+void openSLHelperDestroy(OpenSLHelper* pHelper);
+
+void recorderInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate);
+
+void playerInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate);
+
+#endif /* ifndef OPENSL_HELPER_H_ */

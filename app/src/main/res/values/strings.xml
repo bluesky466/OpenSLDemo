@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">OpenSLDemo</string>
+    <string name="playing">playing</string>
+    <string name="not_playing">not playing</string>
+    <string name="recording">recording</string>
+    <string name="not_recording">not recording</string>
+</resources>
