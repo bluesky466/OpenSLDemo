@@ -17,7 +17,7 @@ extern "C" {
 static volatile int gPlaying = 0;
 static volatile int gRecording = 0;
 
-static int convertSampleRate(sampleRate){
+static SLuint32 convertSampleRate(int sampleRate){
 	switch(sampleRate) {
 		case 8000:
 			return SL_SAMPLINGRATE_8;
@@ -45,7 +45,7 @@ static int convertSampleRate(sampleRate){
 	    case 192000:
 	        return SL_SAMPLINGRATE_192;
 	    default:
-	        return -1;
+	        return 0;
 	}
 }
 

@@ -85,7 +85,7 @@ void openSLHelperDestroy(OpenSLHelper* pHelper) {
 	}
 }
 
-void recorderInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate) {
+void recorderInit(OpenSLHelper* pHelper, SLuint32 channels, SLuint32 samplingRate) {
 	//////Source//////
 	SLDataLocator_IODevice device;
 	device.locatorType = SL_DATALOCATOR_IODEVICE;
@@ -95,7 +95,7 @@ void recorderInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate) {
 
 	SLDataSource source;
 	source.pLocator = &device;
-	source.pFormat = NULL;
+	source.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice.
 
 	//////Sink//////
 	SLDataLocator_AndroidSimpleBufferQueue queue;
@@ -156,7 +156,7 @@ void recorderInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate) {
 	);
 }
 
-void playerInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate) {
+void playerInit(OpenSLHelper* pHelper, SLuint32 channels, SLuint32 samplingRate) {
 	//////Source//////
 	SLDataLocator_AndroidSimpleBufferQueue queue;
 	queue.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
@@ -196,7 +196,7 @@ void playerInit(OpenSLHelper* pHelper, int channels, SLuint32 samplingRate) {
 
 	SLDataSink sink;
    	sink.pLocator = &outputMix;
-   	sink.pFormat = NULL;
+   	sink.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice or SLDataLocator_OutputMix.
 
 	//////Player//////
 	id[0] = SL_IID_ANDROIDSIMPLEBUFFERQUEUE;
