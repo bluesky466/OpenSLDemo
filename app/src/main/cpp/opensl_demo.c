@@ -31,7 +31,6 @@ static SLuint32 convertSampleRate(int sampleRate){
             return SL_SAMPLINGRATE_24;
         case 32000:
             return SL_SAMPLINGRATE_32;
-            break;
         case 44100:
 	        return SL_SAMPLINGRATE_44_1;
 	    case 48000:

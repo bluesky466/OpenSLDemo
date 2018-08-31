@@ -39,8 +39,8 @@ void lockDestroy(ThreadLock* pThreadLock);
 void openSLHelperInit(OpenSLHelper* pHelper);
 void openSLHelperDestroy(OpenSLHelper* pHelper);
 
-void recorderInit(OpenSLHelper* pHelper, SLuint32 channels, SLuint32 samplingRate);
+void recorderInit(OpenSLHelper* pHelper, SLuint32 numChannels, SLuint32 samplingRate);
 
-void playerInit(OpenSLHelper* pHelper, SLuint32 channels, SLuint32 samplingRate);
+void playerInit(OpenSLHelper* pHelper, SLuint32 numChannels, SLuint32 samplingRate);
 
 #endif /* ifndef OPENSL_HELPER_H_ */
