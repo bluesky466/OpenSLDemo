@@ -41,6 +41,14 @@ void lockDestroy(ThreadLock *pThreadLock) {
 }
 
 void openSLHelperInit(OpenSLHelper *pHelper) {
+    pHelper->engineObject = NULL;
+    pHelper->engineInterface = NULL;
+    pHelper->recorderObject = NULL;
+    pHelper->recorderInterface = NULL;
+    pHelper->outputMixObject = NULL;
+    pHelper->playerObject = NULL;
+    pHelper->playInterface = NULL;
+
     //////Thread Lock//////
     lockInit(&(pHelper->threadLock));
 
@@ -95,33 +103,28 @@ void openSLHelperDestroy(OpenSLHelper *pHelper) {
 
 void recorderInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 samplingRate) {
     //////Source//////
-    SLDataLocator_IODevice device;
-    device.locatorType = SL_DATALOCATOR_IODEVICE;
-    device.deviceType = SL_IODEVICE_AUDIOINPUT;
-    device.deviceID = SL_DEFAULTDEVICEID_AUDIOINPUT;
-    device.device = NULL; //Must be NULL if deviceID parameter is to be used.
+    pHelper->device.locatorType = SL_DATALOCATOR_IODEVICE;
+    pHelper->device.deviceType = SL_IODEVICE_AUDIOINPUT;
+    pHelper->device.deviceID = SL_DEFAULTDEVICEID_AUDIOINPUT;
+    pHelper->device.device = NULL; //Must be NULL if deviceID parameter is to be used.
 
-    SLDataSource source;
-    source.pLocator = &device;
-    source.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice.
+    pHelper->source.pLocator = &(pHelper->device);
+    pHelper->source.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice.
 
     //////Sink//////
-    SLDataLocator_AndroidSimpleBufferQueue queue;
-    queue.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
-    queue.numBuffers = 2;
+    pHelper->queue.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
+    pHelper->queue.numBuffers = 2;
 
-    SLDataFormat_PCM format;
-    format.formatType = SL_DATAFORMAT_PCM;
-    format.numChannels = numChannels;
-    format.samplesPerSec = samplingRate;
-    format.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-    format.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
-    format.channelMask = getChannelMask(numChannels);
-    format.endianness = SL_BYTEORDER_LITTLEENDIAN;
+    pHelper->format.formatType = SL_DATAFORMAT_PCM;
+    pHelper->format.numChannels = numChannels;
+    pHelper->format.samplesPerSec = samplingRate;
+    pHelper->format.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
+    pHelper->format.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+    pHelper->format.channelMask = getChannelMask(numChannels);
+    pHelper->format.endianness = SL_BYTEORDER_LITTLEENDIAN;
 
-    SLDataSink sink;
-    sink.pLocator = &queue;
-    sink.pFormat = &format;
+    pHelper->sink.pLocator = &(pHelper->queue);
+    pHelper->sink.pFormat = &(pHelper->format);
 
     //////Recorder//////
     SLInterfaceID id[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE};
@@ -130,8 +133,8 @@ void recorderInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 sampling
     (*pHelper->engineInterface)->CreateAudioRecorder(
             pHelper->engineInterface,
             &(pHelper->recorderObject),
-            &source,
-            &sink,
+            &(pHelper->source),
+            &(pHelper->sink),
             1,
             id,
             required
@@ -166,22 +169,19 @@ void recorderInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 sampling
 
 void playerInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 samplingRate) {
     //////Source//////
-    SLDataLocator_AndroidSimpleBufferQueue queue;
-    queue.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
-    queue.numBuffers = 2;
+    pHelper->queue.locatorType = SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE;
+    pHelper->queue.numBuffers = 2;
 
-    SLDataFormat_PCM format;
-    format.formatType = SL_DATAFORMAT_PCM;
-    format.numChannels = numChannels;
-    format.samplesPerSec = samplingRate;
-    format.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
-    format.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
-    format.channelMask = getChannelMask(numChannels);
-    format.endianness = SL_BYTEORDER_LITTLEENDIAN;
+    pHelper->format.formatType = SL_DATAFORMAT_PCM;
+    pHelper->format.numChannels = numChannels;
+    pHelper->format.samplesPerSec = samplingRate;
+    pHelper->format.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
+    pHelper->format.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
+    pHelper->format.channelMask = getChannelMask(numChannels);
+    pHelper->format.endianness = SL_BYTEORDER_LITTLEENDIAN;
 
-    SLDataSource source;
-    source.pLocator = &queue;
-    source.pFormat = &format;
+    pHelper->source.pLocator = &(pHelper->queue);
+    pHelper->source.pFormat = &(pHelper->format);
 
     //////Sink//////
     (*pHelper->engineInterface)->CreateOutputMix(
@@ -196,13 +196,12 @@ void playerInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 samplingRa
             SL_BOOLEAN_FALSE
     );
 
-    SLDataLocator_OutputMix outputMix;
-    outputMix.locatorType = SL_DATALOCATOR_OUTPUTMIX;
-    outputMix.outputMix = pHelper->outputMixObject;
 
-    SLDataSink sink;
-    sink.pLocator = &outputMix;
-    sink.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice or SLDataLocator_OutputMix.
+    pHelper->outputMix.locatorType = SL_DATALOCATOR_OUTPUTMIX;
+    pHelper->outputMix.outputMix = pHelper->outputMixObject;
+
+    pHelper->sink.pLocator = &(pHelper->outputMix);
+    pHelper->sink.pFormat = NULL; //This parameter is ignored if pLocator is SLDataLocator_IODevice or SLDataLocator_OutputMix.
 
     //////Player//////
     SLInterfaceID id[] = {SL_IID_ANDROIDSIMPLEBUFFERQUEUE};
@@ -210,8 +209,8 @@ void playerInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 samplingRa
     (*pHelper->engineInterface)->CreateAudioPlayer(
             pHelper->engineInterface,
             &(pHelper->playerObject),
-            &source,
-            &sink,
+            &(pHelper->source),
+            &(pHelper->sink),
             1,
             id,
             required

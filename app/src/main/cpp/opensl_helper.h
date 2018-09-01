@@ -28,6 +28,14 @@ typedef struct {
 
 	SLAndroidSimpleBufferQueueItf queueInterface;
 
+	SLDataLocator_AndroidSimpleBufferQueue queue;
+	SLDataFormat_PCM format;
+	SLDataLocator_OutputMix outputMix;
+	SLDataLocator_IODevice device;
+
+	SLDataSource source;
+	SLDataSink sink;
+
 	ThreadLock threadLock;
 } OpenSLHelper;
 
