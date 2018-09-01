@@ -99,7 +99,7 @@ void recorderInit(OpenSLHelper *pHelper, SLuint32 numChannels, SLuint32 sampling
     device.locatorType = SL_DATALOCATOR_IODEVICE;
     device.deviceType = SL_IODEVICE_AUDIOINPUT;
     device.deviceID = SL_DEFAULTDEVICEID_AUDIOINPUT;
-    device.device = NULL;
+    device.device = NULL; //Must be NULL if deviceID parameter is to be used.
 
     SLDataSource source;
     source.pLocator = &device;
